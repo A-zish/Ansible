@@ -1,0 +1,28 @@
+ - hosts: httpd
+   tasks:
+     - name: installing httpd
+       package:
+          name: "httpd"
+          state: "present"
+
+     - name: Content for website
+       copy:
+          dest: "/var/www/html/index.html"
+          content: " This is test for ideampotence checking"
+
+     - name: configuration of httpd conf file
+       template:
+          dest: "/etc/httpd/conf.d/new_file.confg"
+          src: "/root/ws1/new_file.confg"
+       notify: httpd service restart
+
+     - name: starting httpd service
+       service:
+          name: "httpd"
+          state: "started"
+   handlers:
+     - name: httpd service restart
+       service:
+          name: "httpd"
+          state: "restarted"
+
