@@ -1,0 +1,43 @@
+- hosts: docker
+  tasks:
+       - name: docker configuration
+         yum_repository:
+             name: "docker_repo"
+             description: "Docker Package"
+             baseurl: http://download.docker.com/linux/centos/7/x86_64/stable/
+             gpgcheck: no
+       - name: installing docker
+         package:
+             name: "docker-ce-18.06.3.ce-3.el7.x86_64"
+             state: present
+       - name: starting docker service
+         service:
+             name: "docker"
+             state: started
+             enabled: yes
+       - name: "Installing python3"
+         package:
+             name: " python3"
+             state: present
+       - name: "Installing docker sdk"
+         command: pip3 install docker
+       - name: "pulling httpd image from docker hub"
+         docker_image:
+             name: httpd
+             source: pull
+       - name: "coping html file"
+         copy:
+              content: "http server on docker"
+              dest: "/var/www/html/index.html"
+       - name: "launch httpd container and Expose to public"
+         docker_container:
+              name: "webserver"
+              image: httpd
+              state: started
+              exposed_ports:
+              - "80"
+              ports:
+              - "8888:80"
+              volumes:
+              - /var/www/html/:/usr/local/apache2/htdocs/
+
